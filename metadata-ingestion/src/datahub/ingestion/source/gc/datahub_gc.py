@@ -97,6 +97,7 @@ class DataHubGcSourceReport(
 ):
     expired_tokens_revoked: int = 0
     cleanup_metrics: Dict[str, CleanupOperationMetrics] = field(default_factory=dict)
+    event_not_produced_warn: bool = False
 
     def record_success(self, operation_name: str, timing: float) -> None:
         self.cleanup_metrics[operation_name] = CleanupOperationMetrics(
@@ -135,7 +136,6 @@ class DataHubGcSource(Source):
         self.ctx = ctx
         self.config = config
         self.report = DataHubGcSourceReport()
-        self.report.event_not_produced_warn = False
         self.graph = ctx.require_graph("The DataHubGc source")
         self.dataprocess_cleanup = DataProcessCleanup(
             ctx, self.config.dataprocess_cleanup, self.report, self.config.dry_run
