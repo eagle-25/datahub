@@ -98,6 +98,9 @@ query getDataJobRuns($dataJobUrn: String!, $start: Int!, $count: Int!) {
 
 
 class DataProcessCleanupConfig(ConfigModel):
+    enabled: bool = Field(
+        default=False, description="Whether to do data process cleanup."
+    )
     retention_days: Optional[int] = Field(
         10,
         description="Number of days to retain metadata in DataHub",
@@ -398,6 +401,8 @@ class DataProcessCleanup:
             previous_scroll_id = scroll_id
 
     def get_workunits_internal(self) -> Iterable[MetadataWorkUnit]:
+        if not self.config.enabled:
+            return []
         assert self.ctx.graph
 
         dataFlows: Dict[str, DataFlowEntity] = {}
